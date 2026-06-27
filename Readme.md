@@ -157,7 +157,8 @@ This README was also generated with AI assistance and then reviewed to provide a
 
 **Vansh Kashyap**
 
-GitHub: *(Add your GitHub profile link here)*
+vercel link: https://mongo-db-project-seven.vercel.app/
+render link: https://mongo-db-project.onrender.com/
 
 ---
 
