@@ -1,65 +1,88 @@
 import { useState } from "react";
 import API from "../services/api";
 
-function TaskForm() {
+function TaskForm({ setTasks }) {
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [priority, setPriority] = useState("Medium");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("Medium");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
-    await API.post("/", {
-      title,
-      description,
-      priority,
-    });
+    if (title.trim() === "") {
+      alert("Please enter task title");
+      return;
+    }
 
-    alert("Task Added Successfully!");
+    try {
 
-    setTitle("");
-    setDescription("");
-    setPriority("Medium");
+      setLoading(true);
 
-    window.location.reload();
-  } catch (error) {
-    console.error("Error adding task:", error);
-  }
-};
-    return (
+      const res = await API.post("/", {
+        title,
+        description,
+        priority,
+      });
 
-        <form onSubmit={handleSubmit}>
+      alert("Task Added Successfully!");
 
-            <input
-                type="text"
-                placeholder="Task Title"
-                value={title}
-                onChange={(e)=>setTitle(e.target.value)}
-            />
+      setTasks((prevTasks) => [
+        res.data.data,
+        ...prevTasks,
+      ]);
 
-            <textarea
-                placeholder="Description"
-                value={description}
-                onChange={(e)=>setDescription(e.target.value)}
-            />
+      setTitle("");
+      setDescription("");
+      setPriority("Medium");
 
-            <select
-                value={priority}
-                onChange={(e)=>setPriority(e.target.value)}
-            >
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
-            </select>
+    } catch (error) {
 
-            <button>Add Task</button>
+      alert("Something went wrong.");
+      console.log(error);
 
-        </form>
+    } finally {
 
-    )
+      setLoading(false);
 
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+
+      <input
+        type="text"
+        placeholder="Task Title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      <textarea
+        placeholder="Task Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+
+      <select
+        value={priority}
+        onChange={(e) => setPriority(e.target.value)}
+      >
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+      </select>
+
+      <button
+        type="submit"
+        disabled={loading}
+      >
+        {loading ? "Adding..." : "Add Task"}
+      </button>
+
+    </form>
+  );
 }
 
 export default TaskForm;

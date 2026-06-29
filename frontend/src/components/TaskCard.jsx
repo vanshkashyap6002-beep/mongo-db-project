@@ -1,65 +1,133 @@
 import API from "../services/api";
 
-function TaskCard({ task }) {
+function TaskCard({ task, setTasks }) {
+
+  // Delete Task
   const deleteTask = async () => {
-    await API.delete(`/${task._id}`);
-    window.location.reload();
+
+    try {
+
+      await API.delete(`/${task._id}`);
+
+      setTasks((prevTasks) =>
+        prevTasks.filter(
+          (item) => item._id !== task._id
+        )
+      );
+
+      alert("Task Deleted Successfully!");
+
+    } catch (error) {
+
+      alert("Unable to delete task.");
+
+      console.log(error);
+
+    }
+
   };
-const updateTask = async () => {
+
+  // Edit Task
+  const updateTask = async () => {
 
     const title = prompt(
-        "Enter New Title",
-        task.title
+      "Enter New Title",
+      task.title
     );
 
     if (!title) return;
 
-    await API.put(`/${task._id}`,{
-        title
-    });
+    try {
 
-    window.location.reload();
+      const res = await API.put(
+        `/${task._id}`,
+        {
+          title,
+        }
+      );
 
-}
+      setTasks((prevTasks) =>
+        prevTasks.map((item) =>
+          item._id === task._id
+            ? res.data.data
+            : item
+        )
+      );
+
+      alert("Task Updated Successfully!");
+
+    } catch (error) {
+
+      alert("Unable to update task.");
+
+      console.log(error);
+
+    }
+
+  };
+
+  // Change Status
   const updateStatus = async () => {
+
     const newStatus =
       task.status === "Pending"
         ? "Completed"
         : "Pending";
 
-    await API.patch(`/${task._id}/status`, {
-      status: newStatus,
-    });
+    try {
 
-    window.location.reload();
+      const res = await API.patch(
+        `/${task._id}/status`,
+        {
+          status: newStatus,
+        }
+      );
+
+      setTasks((prevTasks) =>
+        prevTasks.map((item) =>
+          item._id === task._id
+            ? res.data.data
+            : item
+        )
+      );
+
+    } catch (error) {
+
+      alert("Unable to update status.");
+
+      console.log(error);
+
+    }
+
   };
 
   return (
-    <div
-      style={{
-        border: "1px solid gray",
-        marginTop: "10px",
-        padding: "10px",
-      }}
-    >
+    <div className="task-card">
+
       <h3>{task.title}</h3>
 
       <p>{task.description}</p>
 
-      <p>{task.priority}</p>
+      <p>
+        <strong>Priority :</strong> {task.priority}
+      </p>
 
-      <p>{task.status}</p>
+      <p>
+        <strong>Status :</strong> {task.status}
+      </p>
 
       <button onClick={updateStatus}>
         Change Status
       </button>
 
+      <button onClick={updateTask}>
+        Edit
+      </button>
+
       <button onClick={deleteTask}>
         Delete
       </button>
-      <button onClick={updateTask}>
-    Edit
-</button>
+
     </div>
   );
 }
