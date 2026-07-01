@@ -74,6 +74,7 @@ Create a `.env` file:
 ```env
 VITE_API_URL=YOUR_BACKEND_API_URL
 ```
+LOCALHOST=http://localhost:5000/api/tasks
 
 Example:
 
