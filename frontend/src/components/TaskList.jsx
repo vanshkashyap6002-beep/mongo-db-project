@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import TaskCard from "./TaskCard";
 
-function TaskList({ tasks, setTasks }) {
+function TaskList({ tasks = [], setTasks }) {
 
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getTasks();
+    fetchTasks();
   }, []);
 
-  const getTasks = async () => {
+  const fetchTasks = async () => {
     try {
 
       const res = await API.get("/");
@@ -21,7 +21,7 @@ function TaskList({ tasks, setTasks }) {
 
     } catch (error) {
 
-      setError("Unable to fetch tasks.");
+      setError("Unable to load tasks.");
 
       console.log(error);
 
@@ -32,43 +32,25 @@ function TaskList({ tasks, setTasks }) {
     <div>
 
       {error && (
-        <p
-          style={{
-            color: "red",
-            marginTop: "10px"
-          }}
-        >
+        <p style={{ color: "red" }}>
           {error}
         </p>
       )}
 
-      {tasks.length > 0 ? (
-
+      {tasks.length === 0 ? (
+        <p>No Tasks Available</p>
+      ) : (
         tasks.map((task) => (
-
           <TaskCard
             key={task._id}
             task={task}
             setTasks={setTasks}
           />
-
         ))
-
-      ) : (
-
-        <p
-          style={{
-            marginTop: "20px"
-          }}
-        >
-          No Tasks Found
-        </p>
-
       )}
 
     </div>
   );
-
 }
 
 export default TaskList;

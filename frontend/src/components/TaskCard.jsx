@@ -1,10 +1,13 @@
+import { useState } from "react";
 import API from "../services/api";
 
 function TaskCard({ task, setTasks }) {
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(task.title);
+
   // Delete Task
   const deleteTask = async () => {
-
     try {
 
       await API.delete(`/${task._id}`);
@@ -20,22 +23,18 @@ function TaskCard({ task, setTasks }) {
     } catch (error) {
 
       alert("Unable to delete task.");
-
       console.log(error);
 
     }
-
   };
 
-  // Edit Task
-  const updateTask = async () => {
+  // Save Edited Task
+  const saveTask = async () => {
 
-    const title = prompt(
-      "Enter New Title",
-      task.title
-    );
-
-    if (!title) return;
+    if (title.trim() === "") {
+      alert("Title cannot be empty");
+      return;
+    }
 
     try {
 
@@ -43,6 +42,8 @@ function TaskCard({ task, setTasks }) {
         `/${task._id}`,
         {
           title,
+          description: task.description,
+          priority: task.priority,
         }
       );
 
@@ -54,19 +55,19 @@ function TaskCard({ task, setTasks }) {
         )
       );
 
+      setIsEditing(false);
+
       alert("Task Updated Successfully!");
 
     } catch (error) {
 
       alert("Unable to update task.");
-
       console.log(error);
 
     }
-
   };
 
-  // Change Status
+  // Update Status
   const updateStatus = async () => {
 
     const newStatus =
@@ -94,41 +95,69 @@ function TaskCard({ task, setTasks }) {
     } catch (error) {
 
       alert("Unable to update status.");
-
       console.log(error);
 
     }
-
   };
 
   return (
+
     <div className="task-card">
 
-      <h3>{task.title}</h3>
+      {isEditing ? (
+
+        <input
+          type="text"
+          value={title}
+          onChange={(e) =>
+            setTitle(e.target.value)
+          }
+        />
+
+      ) : (
+
+        <h3>{task.title}</h3>
+
+      )}
 
       <p>{task.description}</p>
 
       <p>
-        <strong>Priority :</strong> {task.priority}
+        <strong>Priority:</strong> {task.priority}
       </p>
 
       <p>
-        <strong>Status :</strong> {task.status}
+        <strong>Status:</strong> {task.status}
       </p>
 
       <button onClick={updateStatus}>
         Change Status
       </button>
 
-      <button onClick={updateTask}>
-        Edit
-      </button>
+      {isEditing ? (
+
+        <button onClick={saveTask}>
+          Save
+        </button>
+
+      ) : (
+
+        <button
+          onClick={() =>
+            setIsEditing(true)
+          }
+        >
+          Edit
+        </button>
+
+      )}
 
       <button onClick={deleteTask}>
         Delete
       </button>
 
     </div>
+
   );
 }
 
